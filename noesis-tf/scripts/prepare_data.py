@@ -21,8 +21,11 @@ tf.flags.DEFINE_string("vocab_processor", None, "Path to save vocabulary process
 
 FLAGS = tf.flags.FLAGS
 
-TRAIN_PATH = os.path.join(FLAGS.train_in)
-VALIDATION_PATH = os.path.join(FLAGS.validation_in)
+#TRAIN_PATH = os.path.join(FLAGS.train_in)
+#VALIDATION_PATH = os.path.join(FLAGS.validation_in)
+
+TRAIN_PATH = '/home/chorseng/fashion_data/fashion_train.json'
+VALIDATION_PATH = '/home/chorseng/fashion_data/fashion_dev.json'
 
 def tokenizer_fn(iterator):
     return (x.split(" ") for x in iterator)
