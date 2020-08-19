@@ -24,8 +24,8 @@ FLAGS = tf.flags.FLAGS
 #TRAIN_PATH = os.path.join(FLAGS.train_in)
 #VALIDATION_PATH = os.path.join(FLAGS.validation_in)
 
-TRAIN_PATH = '/home/chorseng/fashion_data/fashion_train.json'
-VALIDATION_PATH = '/home/chorseng/fashion_data/fashion_dev.json'
+TRAIN_PATH = '/home/chorseng/fashion_data/dialogs/train/fashion_train_dials.json'
+VALIDATION_PATH = '/home/chorseng/fashion_data/dialogs/valid/fashion_dev_dials.json'
 
 def tokenizer_fn(iterator):
     return (x.split(" ") for x in iterator)
