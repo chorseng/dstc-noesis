@@ -34,7 +34,7 @@ def combine_data(dialogs, candidates, mode):
     raw_data = []
     idx1 = -1
 
-    for dialog in dialogs['dialogue_data']:
+    for dialog in dialogs:
         idx2 = -1
         idx1+=1
         for dialog_turn in dialog['dialogue']:
