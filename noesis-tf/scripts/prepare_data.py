@@ -26,6 +26,38 @@ FLAGS = tf.flags.FLAGS
 
 TRAIN_PATH = '/home/chorseng/fashion_data/dialogs/train/fashion_train_dials.json'
 VALIDATION_PATH = '/home/chorseng/fashion_data/dialogs/valid/fashion_dev_dials.json'
+TRAIN_CANDIDATE_PATH = '/home/chorseng/fashion_data/dialogs/train/fashion_train_dials_retrieval_candidates.json'
+VALIDATION_CANDIDATE_PATH = '/home/chorseng/fashion_data/dialogs/train/fashion_dev_dials_retrieval_candidates.json'
+
+def combine_data(dialogs, candidates):
+    raw_data = []
+    idx1 = -1
+
+    for dialog in dialogs:
+        idx2 = -1
+        idx1+=1
+        for dialog_turn in dialog:
+            idx2+=1
+            dial_dict = {}
+            dial_dict['data_split'] = 'train'
+            dial_dict['domain'] = 'fashion'
+            dial_dict['example-id'] = str(dialog['dialogue_idx']) + '-' + str(dialog_turn['turn_idx'])
+            dial_dict['messages-so-far'] = [{'speaker' : USER, 'utterance': dialog['transcript']}]
+            
+            correct_candidate_idx = candidates['retrieval_candidates'][idx1]['retrieval_candidates'][idx2]['retrieval_candidates'][0]
+            correct_candidate_response = candidates['system_transcript_pool'][int(correct_candidate_idx)]      
+            dial_dict['options-for-correct-answers'] = [{'candidate-id': correct_candidate_idx, 'utterance': correct_candidate_response}]
+            
+            dial_dict['options-for-next'] = []
+            for candidate_response in candidates['retrieval_candidates'][idx1]['retrieval_candidates'][idx2]['retrieval_candidates']:
+                candidate_dict = {'candidate-id': candidate_response, 'utterance': candicates['system_transcript_pool'][int(candidate_response)]
+                dial_dict['options-for-next'].append(candidate_dict)
+            
+            raw_data.append(dial_dict)
+    
+    return raw_data
+
+
 
 def tokenizer_fn(iterator):
     return (x.split(" ") for x in iterator)
@@ -39,10 +71,15 @@ def process_dialog(dialog):
     """
 
     row = []
-    utterances = dialog['messages-so-far']
+    utterances = dialog['messages-so-far']                            
+    #utterances = dialog['transcript']
 
     # Create the context
     context = ""
+    #speaker = USER
+    #context += utterance + "__eou__"
+    
+    
     speaker = None
     for msg in utterances:
         if speaker is None:
@@ -59,7 +96,12 @@ def process_dialog(dialog):
 
     # Create the next utterance options and the target label
     correct_answer = dialog['options-for-correct-answers'][0]
+    #correct_answer = dialog['system_transcript']
+    #for idx, response in enumerate(response_pool):
+    #    if response == correct_answer:
+    #        target_id = idx
     target_id = correct_answer['candidate-id']
+    
     target_index = None
     for i, utterance in enumerate(dialog['options-for-next']):
         if utterance['candidate-id'] == target_id:
@@ -82,9 +124,12 @@ def create_dialog_iter(filename):
     """
     with open(filename, 'rb') as f:
         json_data = ijson.items(f, 'item')
-        for entry in json_data:
-            row = process_dialog(entry)
-            yield row
+        # iterating through conversations
+        for entry in json_data['dialogue_data']:
+            # iterating through rounds of conversations
+            for dial in entry['dialogue']:
+                row = process_dialog(dial)
+                yield row
 
 def create_utterance_iter(input_iter):
     """
@@ -182,7 +227,19 @@ def write_vocabulary(vocab_processor, outfile):
 
 if __name__ == "__main__":
     print("Creating vocabulary...")
-    input_iter = create_dialog_iter(TRAIN_PATH)
+    
+    p = TRAIN_PATH
+    with open(p, 'r') as f:
+        train_json = json.load(f)
+    dialogs_json = train_json['dialogue_data']
+    
+    p2 = TRAIN_CANDIDATES_PATH
+    with open(p2, 'r') as f:
+        candidates_json = json.load(f)
+    
+    raw_data = combine_data(dialogs_json, candidates_json)
+    #input_iter = create_dialog_iter(TRAIN_PATH)
+    input_iter = create_dialog_iter(raw_data)
     input_iter = create_utterance_iter(input_iter)
     vocab = create_vocab(input_iter, min_frequency=FLAGS.min_word_frequency)
     print("Total vocabulary size: {}".format(len(vocab.vocabulary_)))
