@@ -42,7 +42,10 @@ def combine_data(dialogs, candidates, mode):
             dial_dict = {}
             dial_dict['data_split'] = mode
             dial_dict['domain'] = 'fashion'
-            dial_dict['example-id'] = str(dialog['dialogue_idx']) + '-' + str(dialog_turn['turn_idx'])
+            index1 = str(dialog['dialogue_idx'])
+            index2 = str(dialog_turn['turn_idx'])
+            dial_dict['example-id'] = index1 + '-' + index2         
+            #dial_dict['example-id'] = str(dialog['dialogue_idx']) + '-' + str(dialog_turn['turn_idx'])
             dial_dict['messages-so-far'] = [{'speaker' : USER, 'utterance': dialog['transcript']}]
             
             correct_candidate_idx = candidates['retrieval_candidates'][idx1]['retrieval_candidates'][idx2]['retrieval_candidates'][0]
