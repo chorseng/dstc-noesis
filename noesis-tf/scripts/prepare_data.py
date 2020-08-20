@@ -34,10 +34,10 @@ def combine_data(dialogs, candidates, mode):
     raw_data = []
     idx1 = -1
 
-    for dialog in dialogs:
+    for dialog in dialogs['dialogue_data']:
         idx2 = -1
         idx1+=1
-        for dialog_turn in dialog:
+        for dialog_turn in dialog['dialogue']:
             idx2+=1
             dial_dict = {}
             dial_dict['data_split'] = mode
