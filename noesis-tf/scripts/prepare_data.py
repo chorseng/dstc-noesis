@@ -50,7 +50,7 @@ def combine_data(dialogs, candidates, mode):
             
             dial_dict['options-for-next'] = []
             for candidate_response in candidates['retrieval_candidates'][idx1]['retrieval_candidates'][idx2]['retrieval_candidates']:
-                candidate_dict = {'candidate-id': candidate_response, 'utterance': candicates['system_transcript_pool'][int(candidate_response)]
+                candidate_dict = {'candidate-id': candidate_response, 'utterance': candidates['system_transcript_pool'][int(candidate_response)]}
                 dial_dict['options-for-next'].append(candidate_dict)
             
             raw_data.append(dial_dict)
