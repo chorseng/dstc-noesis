@@ -27,8 +27,8 @@ FLAGS = tf.flags.FLAGS
 
 TRAIN_PATH = '/home/chorseng/fashion_data/dialogs/train/fashion_train_dials.json'
 VALIDATION_PATH = '/home/chorseng/fashion_data/dialogs/valid/fashion_dev_dials.json'
-TRAIN_CANDIDATE_PATH = '/home/chorseng/fashion_data/dialogs/train/fashion_train_dials_retrieval_candidates.json'
-VALIDATION_CANDIDATE_PATH = '/home/chorseng/fashion_data/dialogs/train/fashion_dev_dials_retrieval_candidates.json'
+TRAIN_CANDIDATES_PATH = '/home/chorseng/fashion_data/dialogs/train/fashion_train_dials_retrieval_candidates.json'
+VALIDATION_CANDIDATES_PATH = '/home/chorseng/fashion_data/dialogs/train/fashion_dev_dials_retrieval_candidates.json'
 
 def combine_data(dialogs, candidates, mode):
     raw_data = []
