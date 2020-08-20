@@ -29,7 +29,7 @@ VALIDATION_PATH = '/home/chorseng/fashion_data/dialogs/valid/fashion_dev_dials.j
 TRAIN_CANDIDATE_PATH = '/home/chorseng/fashion_data/dialogs/train/fashion_train_dials_retrieval_candidates.json'
 VALIDATION_CANDIDATE_PATH = '/home/chorseng/fashion_data/dialogs/train/fashion_dev_dials_retrieval_candidates.json'
 
-def combine_data(dialogs, candidates):
+def combine_data(dialogs, candidates, mode):
     raw_data = []
     idx1 = -1
 
@@ -39,7 +39,7 @@ def combine_data(dialogs, candidates):
         for dialog_turn in dialog:
             idx2+=1
             dial_dict = {}
-            dial_dict['data_split'] = 'train'
+            dial_dict['data_split'] = mode
             dial_dict['domain'] = 'fashion'
             dial_dict['example-id'] = str(dialog['dialogue_idx']) + '-' + str(dialog_turn['turn_idx'])
             dial_dict['messages-so-far'] = [{'speaker' : USER, 'utterance': dialog['transcript']}]
@@ -125,11 +125,14 @@ def create_dialog_iter(filename):
     with open(filename, 'rb') as f:
         json_data = ijson.items(f, 'item')
         # iterating through conversations
-        for entry in json_data['dialogue_data']:
+        #for entry in json_data['dialogue_data']:
+        for entry in json_data:
+            row = process_dialog(entry)
+            yield row
             # iterating through rounds of conversations
-            for dial in entry['dialogue']:
-                row = process_dialog(dial)
-                yield row
+            #for dial in entry['dialogue']:
+            #    row = process_dialog(dial)
+            #    yield row
 
 def create_utterance_iter(input_iter):
     """
@@ -237,9 +240,11 @@ if __name__ == "__main__":
     with open(p2, 'r') as f:
         candidates_json = json.load(f)
     
-    raw_data = combine_data(dialogs_json, candidates_json)
+    raw_data = combine_data(dialogs_json, candidates_json, 'train')
+    with open('raw_data_train.json', 'w') as f:  # writing JSON object
+        json.dump(raw_data, f)
     #input_iter = create_dialog_iter(TRAIN_PATH)
-    input_iter = create_dialog_iter(raw_data)
+    input_iter = create_dialog_iter('raw_data_train.json')
     input_iter = create_utterance_iter(input_iter)
     vocab = create_vocab(input_iter, min_frequency=FLAGS.min_word_frequency)
     print("Total vocabulary size: {}".format(len(vocab.vocabulary_)))
@@ -253,12 +258,29 @@ if __name__ == "__main__":
 
     # Create train.tfrecords
     create_tfrecords_file(
-        input_filename=TRAIN_PATH,
+        #input_filename=TRAIN_PATH,
+        input_filename= 'raw_data_train.json',
         output_filename=os.path.join(FLAGS.train_out),
         example_fn=functools.partial(create_example_new_format, vocab=vocab))
-
+   
+    p3 = VALIDATION_PATH
+    with open(p3, 'r') as f:
+        valid_json = json.load(f)
+    dialogs_json = valid_json['dialogue_data']
+    
+    p4 = VALIDATION_CANDIDATES_PATH
+    with open(p4, 'r') as f:
+        candidates_json = json.load(f)
+    
+    raw_data = combine_data(dialogs_json, candidates_json, 'dev')
+    with open('raw_data_dev.json', 'w') as f:  # writing JSON object
+        json.dump(raw_data, f)
+                                  
+                                  
+                                  
     # Create validation.tfrecords
     create_tfrecords_file(
-        input_filename=VALIDATION_PATH,
+        #input_filename=VALIDATION_PATH,
+        input_filename='raw_data_dev.json',
         output_filename=os.path.join(FLAGS.validation_out),
         example_fn=functools.partial(create_example_new_format, vocab=vocab))
