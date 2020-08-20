@@ -46,7 +46,7 @@ def combine_data(dialogs, candidates, mode):
             index2 = str(dialog_turn['turn_idx'])
             dial_dict['example-id'] = index1 + '-' + index2         
             #dial_dict['example-id'] = str(dialog['dialogue_idx']) + '-' + str(dialog_turn['turn_idx'])
-            dial_dict['messages-so-far'] = [{'speaker' : USER, 'utterance': dialog['transcript']}]
+            dial_dict['messages-so-far'] = [{'speaker' : 'USER', 'utterance': dialog['transcript']}]
             
             correct_candidate_idx = candidates['retrieval_candidates'][idx1]['retrieval_candidates'][idx2]['retrieval_candidates'][0]
             correct_candidate_response = candidates['system_transcript_pool'][int(correct_candidate_idx)]      
