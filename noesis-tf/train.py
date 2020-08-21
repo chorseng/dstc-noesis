@@ -37,37 +37,54 @@ def main(unused_argv):
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
 
+    print("Creating hyper params...")    
     hyper_params = create_hparams()
-
+    print("Hyper params created!")
+    
+    print("Creating model...")
     model_fn = model.create_model_fn(
         hyper_params,
         model_impl=dual_encoder_model)
-
+    print("Model created!")
+    
+    print("Creating estimator...")
     estimator = tf.contrib.learn.Estimator(
         model_fn=model_fn,
         model_dir=MODEL_DIR,
         config=tf.contrib.learn.RunConfig(session_config=config))
-
+    print("Estimator created!")
+    
+    print("Creating input function... ")
     input_fn_train = inputs.create_input_fn(
         mode=tf.contrib.learn.ModeKeys.TRAIN,
         input_files=[TRAIN_FILE],
         batch_size=hyper_params.batch_size,
         num_epochs=FLAGS.num_epochs)
-
+    print("Input function created!")
+    
+    
+    print("Creating input evaluation... ")
     input_fn_eval = inputs.create_input_fn(
         mode=tf.contrib.learn.ModeKeys.EVAL,
         input_files=[VALIDATION_FILE],
         batch_size=hyper_params.eval_batch_size,
         num_epochs=1)
+    print("Input evaluation created!")
 
+    print("Creating evaluation metrics... ")
     eval_metrics = metrics.create_evaluation_metrics()
-
+    print("Evaluation metrics created!")
+    
+    
+    print("Creating validation monitor ..."
     eval_monitor = tf.contrib.learn.monitors.ValidationMonitor(
         input_fn=input_fn_eval,
         every_n_steps=FLAGS.eval_every,
         metrics=eval_metrics)
-
+    
+    print("Commencing fitting... ")
     estimator.fit(input_fn=input_fn_train, steps=None, monitors=[eval_monitor])
+    print("Fitting completed!")
 
 
 if __name__ == "__main__":
