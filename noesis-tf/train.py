@@ -76,7 +76,7 @@ def main(unused_argv):
     print("Evaluation metrics created!")
     
     
-    print("Creating validation monitor ..."
+    print("Creating validation monitor ...")
     eval_monitor = tf.contrib.learn.monitors.ValidationMonitor(
         input_fn=input_fn_eval,
         every_n_steps=FLAGS.eval_every,
